@@ -14,5 +14,5 @@ if (!defined('DB_HOST')) {
     define('DB_NAME', cfg('DB_NAME', 'brightstart'));
     define('DB_PORT', (int) cfg('DB_PORT', '3306'));
     // Firebase "Web API key" (public value, safe to keep here). Used to verify Google sign-in tokens.
-    define('FIREBASE_API_KEY', cfg('FIREBASE_API_KEY', 'PASTE_YOUR_FIREBASE_API_KEY_HERE'));
+    define('FIREBASE_API_KEY', cfg('FIREBASE_API_KEY', 'AIzaSyBTTdUkcsUGhKoTtVNPiLCVWJIXzLIxffE'));
 }
