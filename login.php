@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($email) || empty($password)) {
         $error = 'Please enter both email and password.';
     } else {
-        $stmt = $conn->prepare("SELECT AdminID,FullName,Email,PasswordHash,Role,Verified FROM Administrator WHERE Email=? LIMIT 1");
+        $stmt = $conn->prepare("SELECT AdminID,FullName,Email,PasswordHash,Role,Verified FROM tbladministrator WHERE Email=? LIMIT 1");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $user = $stmt->get_result()->fetch_assoc();

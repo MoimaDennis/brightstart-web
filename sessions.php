@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['action'])) {
 
     if ($_POST['action']==='add') {
         $stmt=$conn->prepare(
-            "INSERT INTO tblSession
+            "INSERT INTO tblsession
              (ProgramID,VolunteerID,SessionDate,StartTime,EndTime,Venue)
              VALUES (?,?,?,?,?,?)"
         );
@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['action'])) {
     } elseif ($_POST['action']==='update') {
         $id=(int)$_POST['sess_id'];
         $stmt=$conn->prepare(
-            "UPDATE tblSession
+            "UPDATE tblsession
              SET ProgramID=?,VolunteerID=?,SessionDate=?,
                  StartTime=?,EndTime=?,Venue=?
              WHERE SessionID=?"
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['action'])) {
 
 if (isset($_GET['delete'])) {
     $id=(int)$_GET['delete'];
-    $stmt=$conn->prepare("DELETE FROM tblSession WHERE SessionID=?");
+    $stmt=$conn->prepare("DELETE FROM tblsession WHERE SessionID=?");
     $stmt->bind_param("i",$id);
     if ($stmt->execute()) { $msg='Session deleted.'; }
     else { $msg='Error: '.$stmt->error; $msgType='danger'; }
@@ -52,23 +52,23 @@ if (isset($_GET['delete'])) {
 
 if ($action==='edit' && isset($_GET['id'])) {
     $res=$conn->query(
-        "SELECT * FROM tblSession WHERE SessionID=".(int)$_GET['id']
+        "SELECT * FROM tblsession WHERE SessionID=".(int)$_GET['id']
     );
     $editSess=$res->fetch_assoc();
 }
 
 $sessions=$conn->query(
     "SELECT s.*,p.ProgramName,v.FullName AS VolName
-     FROM tblSession s
-     JOIN tblProgram p ON s.ProgramID=p.ProgramID
-     JOIN tblVolunteer v ON s.VolunteerID=v.VolunteerID
+     FROM tblsession s
+     JOIN tblprogram p ON s.ProgramID=p.ProgramID
+     JOIN tblvolunteer v ON s.VolunteerID=v.VolunteerID
      ORDER BY s.SessionDate DESC"
 );
 $programs=$conn->query(
-    "SELECT * FROM tblProgram WHERE Status='Active' ORDER BY ProgramName"
+    "SELECT * FROM tblprogram WHERE Status='Active' ORDER BY ProgramName"
 );
 $volunteers=$conn->query(
-    "SELECT * FROM tblVolunteer WHERE Status='Active' ORDER BY FullName"
+    "SELECT * FROM tblvolunteer WHERE Status='Active' ORDER BY FullName"
 );
 ?>
 <!DOCTYPE html>

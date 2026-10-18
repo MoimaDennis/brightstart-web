@@ -21,14 +21,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $msgType = 'danger';
     } else {
         $stmt = $conn->prepare(
-            "INSERT INTO tblDonation (DonorName,DonorContact,DonationAmount,DonationDate,DonationType,Notes)
+            "INSERT INTO tbldonation (DonorName,DonorContact,DonationAmount,DonationDate,DonationType,Notes)
              VALUES (?,?,?,?,?,?)"
         );
         $stmt->bind_param("ssdsss", $donorName, $donorContact, $amount, $date, $type, $notes);
         if ($stmt->execute()) {
             $newId = $stmt->insert_id;
             $msg = "Thank you, $donorName! Your donation has been recorded.";
-            $rRes = $conn->query("SELECT * FROM tblDonation WHERE DonationID=$newId");
+            $rRes = $conn->query("SELECT * FROM tbldonation WHERE DonationID=$newId");
             $showReceipt = $rRes->fetch_assoc();
         } else {
             $msg = 'Error: ' . $stmt->error;
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $myDonations = $conn->query(
-    "SELECT * FROM tblDonation WHERE DonorContact='" . $conn->real_escape_string($currentEmail) . "'
+    "SELECT * FROM tbldonation WHERE DonorContact='" . $conn->real_escape_string($currentEmail) . "'
      ORDER BY DonationDate DESC"
 );
 $myTotal = 0;

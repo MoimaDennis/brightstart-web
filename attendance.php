@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['attendance'])) {
         $studentId=(int)$studentId;
         $notes=trim($_POST['notes'][$studentId]??'');
         $stmt=$conn->prepare(
-            "INSERT INTO tblAttendance
+            "INSERT INTO tblattendance
              (SessionID,StudentID,AttendanceStatus,Notes)
              VALUES (?,?,?,?)
              ON DUPLICATE KEY UPDATE
@@ -28,9 +28,9 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['attendance'])) {
 $sessions=$conn->query(
     "SELECT s.SessionID,p.ProgramName,v.FullName AS VolName,
             s.SessionDate,s.Venue
-     FROM tblSession s
-     JOIN tblProgram p ON s.ProgramID=p.ProgramID
-     JOIN tblVolunteer v ON s.VolunteerID=v.VolunteerID
+     FROM tblsession s
+     JOIN tblprogram p ON s.ProgramID=p.ProgramID
+     JOIN tblvolunteer v ON s.VolunteerID=v.VolunteerID
      ORDER BY s.SessionDate DESC"
 );
 
@@ -39,9 +39,9 @@ $enrolledStudents=[];
 if ($sessionId>0) {
     $res=$conn->query(
         "SELECT s.*,p.ProgramName,v.FullName AS VolName,s.ProgramID
-         FROM tblSession s
-         JOIN tblProgram p ON s.ProgramID=p.ProgramID
-         JOIN tblVolunteer v ON s.VolunteerID=v.VolunteerID
+         FROM tblsession s
+         JOIN tblprogram p ON s.ProgramID=p.ProgramID
+         JOIN tblvolunteer v ON s.VolunteerID=v.VolunteerID
          WHERE s.SessionID=$sessionId"
     );
     $sessionInfo=$res->fetch_assoc();
@@ -50,9 +50,9 @@ if ($sessionId>0) {
         $studRes=$conn->query(
             "SELECT st.StudentID,st.FirstName,st.LastName,
                     a.AttendanceStatus,a.Notes
-             FROM tblEnrolment e
-             JOIN tblStudent st ON e.StudentID=st.StudentID
-             LEFT JOIN tblAttendance a
+             FROM tblenrolment e
+             JOIN tblstudent st ON e.StudentID=st.StudentID
+             LEFT JOIN tblattendance a
                 ON a.StudentID=st.StudentID
                 AND a.SessionID=$sessionId
              WHERE e.ProgramID=$progId AND e.Status='Active'
@@ -68,10 +68,10 @@ $history=$conn->query(
     "SELECT a.AttendanceStatus,a.Notes,
             CONCAT(s.FirstName,' ',s.LastName) AS StudentName,
             se.SessionDate,p.ProgramName
-     FROM tblAttendance a
-     JOIN tblStudent s ON a.StudentID=s.StudentID
-     JOIN tblSession se ON a.SessionID=se.SessionID
-     JOIN tblProgram p ON se.ProgramID=p.ProgramID
+     FROM tblattendance a
+     JOIN tblstudent s ON a.StudentID=s.StudentID
+     JOIN tblsession se ON a.SessionID=se.SessionID
+     JOIN tblprogram p ON se.ProgramID=p.ProgramID
      ORDER BY se.SessionDate DESC LIMIT 20"
 );
 ?>

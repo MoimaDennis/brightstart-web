@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'add') {
     $enrl = trim($_POST['enrolment_date']);
 
     $stmt = $conn->prepare(
-        "INSERT INTO tblStudent
+        "INSERT INTO tblstudent
          (FirstName,LastName,DateOfBirth,Gender,CommunityArea,ContactNumber,EnrolmentDate)
          VALUES (?,?,?,?,?,?,?)"
     );
@@ -48,16 +48,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'update') {
     $cont = trim($_POST['contact_number']);
     $enrl = trim($_POST['enrolment_date']);
 
-    $stmt = $conn->prepare(
-        "UPDATE tblStudent
+
+        $stmt = $conn->prepare(
+        "UPDATE tblstudent
          SET FirstName=?,LastName=?,DateOfBirth=?,Gender=?,
              CommunityArea=?,ContactNumber=?,EnrolmentDate=?
          WHERE StudentID=?"
     );
     $stmt->bind_param("sssssss i", $fn,$ln,$dob,$gen,$area,$cont,$enrl,$id);
     $stmt->close();
+
     $stmt2 = $conn->prepare(
-        "UPDATE tblStudent
+        "UPDATE tblstudent
          SET FirstName=?,LastName=?,DateOfBirth=?,Gender=?,
              CommunityArea=?,ContactNumber=?,EnrolmentDate=?
          WHERE StudentID=?"
@@ -76,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'update') {
 // ---- DELETE ----
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
-    $stmt = $conn->prepare("DELETE FROM tblStudent WHERE StudentID=?");
+    $stmt = $conn->prepare("DELETE FROM tblstudent WHERE StudentID=?");
     $stmt->bind_param("i", $id);
     if ($stmt->execute()) {
         $msg = 'Student deleted successfully.';
@@ -91,7 +93,7 @@ if (isset($_GET['delete'])) {
 // ---- LOAD FOR EDIT ----
 if ($action === 'edit' && isset($_GET['id'])) {
     $id  = (int)$_GET['id'];
-    $res = $conn->query("SELECT * FROM tblStudent WHERE StudentID=$id");
+    $res = $conn->query("SELECT * FROM tblstudent WHERE StudentID=$id");
     $editStudent = $res->fetch_assoc();
 }
 
@@ -108,10 +110,10 @@ if ($filterArea) {
     $where .= " AND CommunityArea LIKE '%$a%'";
 }
 $students = $conn->query(
-    "SELECT * FROM tblStudent WHERE $where ORDER BY EnrolmentDate DESC"
+    "SELECT * FROM tblstudent WHERE $where ORDER BY EnrolmentDate DESC"
 );
 $totalStudents = $conn->query(
-    "SELECT COUNT(*) AS c FROM tblStudent"
+    "SELECT COUNT(*) AS c FROM tblstudent"
 )->fetch_assoc()['c'];
 ?>
 <!DOCTYPE html>

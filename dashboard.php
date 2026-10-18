@@ -3,15 +3,15 @@ require_once 'includes/auth_guard.php';
 require_once 'includes/DBConn.php';
 
 $stats = [];
-foreach (['tblStudent'=>'students','tblVolunteer'=>'volunteers','tblProgram'=>'programs','tblSession'=>'sessions','tblDonation'=>'donations','tblEnrolment'=>'enrolments'] as $tbl=>$key) {
+foreach (['tblstudent'=>'students','tblvolunteer'=>'volunteers','tblprogram'=>'programs','tblsession'=>'sessions','tbldonation'=>'donations','tblenrolment'=>'enrolments'] as $tbl=>$key) {
     $r=$conn->query("SELECT COUNT(*) AS c FROM $tbl");
     $stats[$key]=$r?$r->fetch_assoc()['c']:0;
 }
-$dRes=$conn->query("SELECT SUM(DonationAmount) AS total FROM tblDonation");
+$dRes=$conn->query("SELECT SUM(DonationAmount) AS total FROM tbldonation");
 $totalDonations=number_format($dRes->fetch_assoc()['total']??0,2);
-$recentStudents=$conn->query("SELECT FirstName,LastName,CommunityArea,EnrolmentDate FROM tblStudent ORDER BY EnrolmentDate DESC LIMIT 5");
-$recentDonations=$conn->query("SELECT DonorName,DonationAmount,DonationDate,DonationType FROM tblDonation ORDER BY DonationDate DESC LIMIT 5");
-$upcomingSessions=$conn->query("SELECT s.SessionID,p.ProgramName,v.FullName AS VolName,s.SessionDate,s.Venue FROM tblSession s JOIN tblProgram p ON s.ProgramID=p.ProgramID JOIN tblVolunteer v ON s.VolunteerID=v.VolunteerID WHERE s.SessionDate>=CURDATE() ORDER BY s.SessionDate ASC LIMIT 5");
+$recentStudents=$conn->query("SELECT FirstName,LastName,CommunityArea,EnrolmentDate FROM tblstudent ORDER BY EnrolmentDate DESC LIMIT 5");
+$recentDonations=$conn->query("SELECT DonorName,DonationAmount,DonationDate,DonationType FROM tbldonation ORDER BY DonationDate DESC LIMIT 5");
+$upcomingSessions=$conn->query("SELECT s.SessionID,p.ProgramName,v.FullName AS VolName,s.SessionDate,s.Venue FROM tblsession s JOIN tblprogram p ON s.ProgramID=p.ProgramID JOIN tblvolunteer v ON s.VolunteerID=v.VolunteerID WHERE s.SessionDate>=CURDATE() ORDER BY s.SessionDate ASC LIMIT 5");
 ?>
 <!DOCTYPE html>
 <html lang="en">

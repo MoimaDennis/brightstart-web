@@ -16,7 +16,7 @@ $editUser = null;
 // ---- VERIFY USER ----
 if (isset($_GET['verify'])) {
     $id   = (int)$_GET['verify'];
-    $stmt = $conn->prepare("UPDATE Administrator SET Verified = 1 WHERE AdminID = ?");
+    $stmt = $conn->prepare("UPDATE tbladministrator SET Verified = 1 WHERE AdminID = ?");
     $stmt->bind_param("i", $id);
     if ($stmt->execute()) {
         $msg = 'User verified successfully. They can now login.';
@@ -31,7 +31,7 @@ if (isset($_GET['verify'])) {
 // ---- REJECT PENDING USER ----
 if (isset($_GET['reject'])) {
     $id   = (int)$_GET['reject'];
-    $stmt = $conn->prepare("DELETE FROM Administrator WHERE AdminID = ? AND Verified = 0");
+    $stmt = $conn->prepare("DELETE FROM tbladministrator WHERE AdminID = ? AND Verified = 0");
     $stmt->bind_param("i", $id);
     if ($stmt->execute()) {
         $msg = 'Registration rejected and removed.';
@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $hash = password_hash($pw, PASSWORD_DEFAULT);
 
     $stmt = $conn->prepare(
-        "INSERT INTO Administrator (FullName, Email, Username, PasswordHash, Role, Verified)
+        "INSERT INTO tbladministrator (FullName, Email, Username, PasswordHash, Role, Verified)
          VALUES (?, ?, ?, ?, ?, 1)"
     );
     $stmt->bind_param("sssss", $fn, $em, $un, $hash, $role);
@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $verified = isset($_POST['verified']) ? 1 : 0;
 
     $stmt = $conn->prepare(
-        "UPDATE Administrator SET FullName=?, Email=?, Username=?, Role=?, Verified=? WHERE AdminID=?"
+        "UPDATE tbladministrator SET FullName=?, Email=?, Username=?, Role=?, Verified=? WHERE AdminID=?"
     );
     $stmt->bind_param("ssssii", $fn, $em, $un, $role, $verified, $id);
     if ($stmt->execute()) {
@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
     if ($id != $_SESSION['admin_id']) {
-        $stmt = $conn->prepare("DELETE FROM Administrator WHERE AdminID = ?");
+        $stmt = $conn->prepare("DELETE FROM tbladministrator WHERE AdminID = ?");
         $stmt->bind_param("i", $id);
         if ($stmt->execute()) {
             $msg = 'User deleted.';
@@ -111,13 +111,13 @@ if (isset($_GET['delete'])) {
 
 // ---- LOAD EDIT ----
 if ($action === 'edit' && isset($_GET['id'])) {
-    $res      = $conn->query("SELECT * FROM Administrator WHERE AdminID=" . (int)$_GET['id']);
+    $res      = $conn->query("SELECT * FROM tbladministrator WHERE AdminID=" . (int)$_GET['id']);
     $editUser = $res->fetch_assoc();
 }
 
 // ---- FETCH DATA ----
-$allUsers     = $conn->query("SELECT * FROM Administrator WHERE Verified = 1 ORDER BY Role, FullName");
-$pendingUsers = $conn->query("SELECT * FROM Administrator WHERE Verified = 0 ORDER BY CreatedAt DESC");
+$allUsers     = $conn->query("SELECT * FROM tbladministrator WHERE Verified = 1 ORDER BY Role, FullName");
+$pendingUsers = $conn->query("SELECT * FROM tbladministrator WHERE Verified = 0 ORDER BY CreatedAt DESC");
 $pendingCount = $pendingUsers->num_rows;
 ?>
 <!DOCTYPE html>

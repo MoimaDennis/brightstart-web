@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['action'])
     $comm =trim($_POST['comments']);
 
     $stmt=$conn->prepare(
-        "INSERT INTO tblPerformance
+        "INSERT INTO tblperformance
          (StudentID,ProgramID,AssessmentDate,Score,Grade,Comments)
          VALUES (?,?,?,?,?,?)"
     );
@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['action'])
 if (isset($_GET['delete'])) {
     $id=(int)$_GET['delete'];
     $stmt=$conn->prepare(
-        "DELETE FROM tblPerformance WHERE PerformanceID=?"
+        "DELETE FROM tblperformance WHERE PerformanceID=?"
     );
     $stmt->bind_param("i",$id);
     if ($stmt->execute()) { $msg='Record deleted.'; }
@@ -52,22 +52,22 @@ $performance=$conn->query(
     "SELECT p.*,
             CONCAT(s.FirstName,' ',s.LastName) AS StudentName,
             pr.ProgramName
-     FROM tblPerformance p
-     JOIN tblStudent s ON p.StudentID=s.StudentID
-     JOIN tblProgram pr ON p.ProgramID=pr.ProgramID
+     FROM tblperformance p
+     JOIN tblstudent s ON p.StudentID=s.StudentID
+     JOIN tblprogram pr ON p.ProgramID=pr.ProgramID
      $where
      ORDER BY p.AssessmentDate DESC"
 );
 $students=$conn->query(
-    "SELECT StudentID,FirstName,LastName FROM tblStudent ORDER BY FirstName"
+    "SELECT StudentID,FirstName,LastName FROM tblstudent ORDER BY FirstName"
 );
 $programs=$conn->query(
-    "SELECT ProgramID,ProgramName FROM tblProgram WHERE Status='Active'"
+    "SELECT ProgramID,ProgramName FROM tblprogram WHERE Status='Active'"
 );
 $avgScore=null;
 if ($filterStudent>0) {
     $avgRes=$conn->query(
-        "SELECT AVG(Score) AS avg FROM tblPerformance
+        "SELECT AVG(Score) AS avg FROM tblperformance
          WHERE StudentID=$filterStudent"
     );
     $avgScore=round($avgRes->fetch_assoc()['avg']??0,1);

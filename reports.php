@@ -18,13 +18,13 @@ function gradeLabel($s) {
 }
 
 $students  = $conn->query(
-    "SELECT StudentID,FirstName,LastName FROM tblStudent ORDER BY FirstName"
+    "SELECT StudentID,FirstName,LastName FROM tblstudent ORDER BY FirstName"
 );
 $volunteers= $conn->query(
-    "SELECT VolunteerID,FullName FROM tblVolunteer ORDER BY FullName"
+    "SELECT VolunteerID,FullName FROM tblvolunteer ORDER BY FullName"
 );
 $programs  = $conn->query(
-    "SELECT ProgramID,ProgramName FROM tblProgram ORDER BY ProgramName"
+    "SELECT ProgramID,ProgramName FROM tblprogram ORDER BY ProgramName"
 );
 ?>
 <!DOCTYPE html>
@@ -111,13 +111,13 @@ $programs  = $conn->query(
             "SELECT p.*,
                     CONCAT(s.FirstName,' ',s.LastName) AS StudentName,
                     pr.ProgramName
-             FROM tblPerformance p
-             JOIN tblStudent s ON p.StudentID=s.StudentID
-             JOIN tblProgram pr ON p.ProgramID=pr.ProgramID
+             FROM tblperformance p
+             JOIN tblstudent s ON p.StudentID=s.StudentID
+             JOIN tblprogram pr ON p.ProgramID=pr.ProgramID
              WHERE $w ORDER BY p.AssessmentDate DESC"
         );
         $avgRes=$conn->query(
-            "SELECT AVG(Score) AS avg FROM tblPerformance p WHERE $w"
+            "SELECT AVG(Score) AS avg FROM tblperformance p WHERE $w"
         );
         $avg=round($avgRes->fetch_assoc()['avg']??0,1);
         ?>
@@ -211,14 +211,14 @@ $programs  = $conn->query(
         if ($from) $dw.=" AND DonationDate>='$from'";
         if ($to)   $dw.=" AND DonationDate<='$to'";
         $dRows=$conn->query(
-            "SELECT * FROM tblDonation WHERE $dw ORDER BY DonationDate DESC"
+            "SELECT * FROM tbldonation WHERE $dw ORDER BY DonationDate DESC"
         );
         $totals=$conn->query(
             "SELECT DonationType,SUM(DonationAmount) AS sub
-             FROM tblDonation WHERE $dw GROUP BY DonationType"
+             FROM tbldonation WHERE $dw GROUP BY DonationType"
         );
         $grandTotal=$conn->query(
-            "SELECT SUM(DonationAmount) AS g FROM tblDonation WHERE $dw"
+            "SELECT SUM(DonationAmount) AS g FROM tbldonation WHERE $dw"
         )->fetch_assoc()['g']??0;
         ?>
         <div class="report-output">
@@ -316,13 +316,13 @@ $programs  = $conn->query(
         $volSess=$conn->query(
             "SELECT s.*,p.ProgramName,v.FullName AS VolName,
                     v.SubjectSpeciality
-             FROM tblSession s
-             JOIN tblProgram p ON s.ProgramID=p.ProgramID
-             JOIN tblVolunteer v ON s.VolunteerID=v.VolunteerID
+             FROM tblsession s
+             JOIN tblprogram p ON s.ProgramID=p.ProgramID
+             JOIN tblvolunteer v ON s.VolunteerID=v.VolunteerID
              WHERE $vw ORDER BY s.SessionDate DESC"
         );
         $totalSess=$conn->query(
-            "SELECT COUNT(*) AS c FROM tblSession s WHERE $vw"
+            "SELECT COUNT(*) AS c FROM tblsession s WHERE $vw"
         )->fetch_assoc()['c']??0;
         ?>
         <div class="report-output">
@@ -411,13 +411,13 @@ $programs  = $conn->query(
             "SELECT e.*,
                     CONCAT(s.FirstName,' ',s.LastName) AS StudentName,
                     s.CommunityArea,p.ProgramName
-             FROM tblEnrolment e
-             JOIN tblStudent s ON e.StudentID=s.StudentID
-             JOIN tblProgram p ON e.ProgramID=p.ProgramID
+             FROM tblenrolment e
+             JOIN tblstudent s ON e.StudentID=s.StudentID
+             JOIN tblprogram p ON e.ProgramID=p.ProgramID
              WHERE $ew ORDER BY e.EnrolmentDate DESC"
         );
         $totalEnrol=$conn->query(
-            "SELECT COUNT(*) AS c FROM tblEnrolment e WHERE $ew"
+            "SELECT COUNT(*) AS c FROM tblenrolment e WHERE $ew"
         )->fetch_assoc()['c']??0;
         ?>
         <div class="report-output">

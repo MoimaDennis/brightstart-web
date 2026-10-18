@@ -13,7 +13,7 @@ if (!$fullName || !$email || !$username || !$password) {
 }
 
 // Check duplicate
-$check = $pdo->prepare("SELECT AdminID FROM administrator WHERE Email=? OR Username=?");
+$check = $pdo->prepare("SELECT AdminID FROM tbladministrator WHERE Email=? OR Username=?");
 $check->execute([$email, $username]);
 if ($check->fetch()) {
     echo json_encode(["success" => false, "message" => "Email or username already exists"]);
@@ -21,6 +21,6 @@ if ($check->fetch()) {
 }
 
 $hash = password_hash($password, PASSWORD_BCRYPT);
-$stmt = $pdo->prepare("INSERT INTO administrator (FullName,Email,Username,PasswordHash,Role,Verified) VALUES (?,?,?,?,?,0)");
+$stmt = $pdo->prepare("INSERT INTO tbladministrator (FullName,Email,Username,PasswordHash,Role,Verified) VALUES (?,?,?,?,?,0)");
 $stmt->execute([$fullName, $email, $username, $hash, $role]);
 echo json_encode(["success" => true, "message" => "Account created. Please wait for administrator approval before logging in."]);

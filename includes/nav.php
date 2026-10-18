@@ -1,5 +1,5 @@
 <?php
-$pendingNav = $conn->query("SELECT COUNT(*) AS c FROM Administrator WHERE Verified = 0");
+$pendingNav = $conn->query("SELECT COUNT(*) AS c FROM tbladministrator WHERE Verified = 0");
 $pendingNavCount = $pendingNav ? $pendingNav->fetch_assoc()['c'] : 0;
 ?>
 <div class="topbar">

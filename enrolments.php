@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     $st =trim($_POST['status']);
 
     $stmt=$conn->prepare(
-        "INSERT INTO tblEnrolment (StudentID,ProgramID,EnrolmentDate,Status)
+        "INSERT INTO tblenrolment (StudentID,ProgramID,EnrolmentDate,Status)
          VALUES (?,?,?,?)"
     );
     $stmt->bind_param("iiss",$sid,$pid,$ed,$st);
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
 
 if (isset($_GET['delete'])) {
     $id=(int)$_GET['delete'];
-    $stmt=$conn->prepare("DELETE FROM tblEnrolment WHERE EnrolmentID=?");
+    $stmt=$conn->prepare("DELETE FROM tblenrolment WHERE EnrolmentID=?");
     $stmt->bind_param("i",$id);
     if ($stmt->execute()) { $msg='Enrolment removed.'; }
     else { $msg='Error: '.$stmt->error; $msgType='danger'; }
@@ -34,16 +34,16 @@ $enrolments=$conn->query(
     "SELECT e.*,
             CONCAT(s.FirstName,' ',s.LastName) AS StudentName,
             p.ProgramName
-     FROM tblEnrolment e
-     JOIN tblStudent s ON e.StudentID=s.StudentID
-     JOIN tblProgram p ON e.ProgramID=p.ProgramID
+     FROM tblenrolment e
+     JOIN tblstudent s ON e.StudentID=s.StudentID
+     JOIN tblprogram p ON e.ProgramID=p.ProgramID
      ORDER BY e.EnrolmentDate DESC"
 );
 $students=$conn->query(
-    "SELECT StudentID,FirstName,LastName FROM tblStudent ORDER BY FirstName"
+    "SELECT StudentID,FirstName,LastName FROM tblstudent ORDER BY FirstName"
 );
 $programs=$conn->query(
-    "SELECT ProgramID,ProgramName FROM tblProgram WHERE Status='Active'"
+    "SELECT ProgramID,ProgramName FROM tblprogram WHERE Status='Active'"
 );
 ?>
 <!DOCTYPE html>

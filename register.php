@@ -23,13 +23,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($password !== $confirm) {
         $error = 'Passwords do not match.';
     } else {
-        $chk = $conn->prepare("SELECT AdminID FROM Administrator WHERE Email=? OR Username=?");
+        $chk = $conn->prepare("SELECT AdminID FROM tbladministrator WHERE Email=? OR Username=?");
         $chk->bind_param("ss",$email,$username); $chk->execute(); $chk->store_result();
         if ($chk->num_rows > 0) {
             $error = 'That email or username is already registered.';
         } else {
             $hash = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $conn->prepare("INSERT INTO Administrator (FullName,Email,Username,PasswordHash,Role,Verified) VALUES (?,?,?,?,?,0)");
+            $stmt = $conn->prepare("INSERT INTO tbladministrator (FullName,Email,Username,PasswordHash,Role,Verified) VALUES (?,?,?,?,?,0)");
             $stmt->bind_param("sssss",$fullName,$email,$username,$hash,$role);
             if ($stmt->execute()) {
                 $success = 'Registration successful! Your account is <strong>pending administrator verification</strong>. You will be able to login once an Admin approves your account.';

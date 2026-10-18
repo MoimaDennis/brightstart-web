@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['action'])
     $nt =trim($_POST['notes']);
 
     $stmt=$conn->prepare(
-        "INSERT INTO tblDonation
+        "INSERT INTO tbldonation
          (DonorName,DonorContact,DonationAmount,DonationDate,DonationType,Notes)
          VALUES (?,?,?,?,?,?)"
     );
@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['action'])
         $newId=$stmt->insert_id;
         $msg="Donation from '$dn' recorded.";
         $rRes=$conn->query(
-            "SELECT * FROM tblDonation WHERE DonationID=$newId"
+            "SELECT * FROM tbldonation WHERE DonationID=$newId"
         );
         $showReceipt=$rRes->fetch_assoc();
     } else {
@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['action'])
 
 if (isset($_GET['delete'])) {
     $id=(int)$_GET['delete'];
-    $stmt=$conn->prepare("DELETE FROM tblDonation WHERE DonationID=?");
+    $stmt=$conn->prepare("DELETE FROM tbldonation WHERE DonationID=?");
     $stmt->bind_param("i",$id);
     if ($stmt->execute()) { $msg='Donation deleted.'; }
     else { $msg='Error: '.$stmt->error; $msgType='danger'; }
@@ -47,15 +47,15 @@ if (isset($_GET['delete'])) {
 
 if (isset($_GET['receipt'])) {
     $id=(int)$_GET['receipt'];
-    $rRes=$conn->query("SELECT * FROM tblDonation WHERE DonationID=$id");
+    $rRes=$conn->query("SELECT * FROM tbldonation WHERE DonationID=$id");
     $showReceipt=$rRes->fetch_assoc();
 }
 
 $donations=$conn->query(
-    "SELECT * FROM tblDonation ORDER BY DonationDate DESC"
+    "SELECT * FROM tbldonation ORDER BY DonationDate DESC"
 );
 $total=$conn->query(
-    "SELECT SUM(DonationAmount) AS t FROM tblDonation"
+    "SELECT SUM(DonationAmount) AS t FROM tbldonation"
 )->fetch_assoc()['t']??0;
 ?>
 <!DOCTYPE html>

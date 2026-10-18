@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['action'])) {
 
     if ($_POST['action']==='add') {
         $stmt=$conn->prepare(
-            "INSERT INTO tblProgram (ProgramName,Description,StartDate,EndDate,Status)
+            "INSERT INTO tblprogram (ProgramName,Description,StartDate,EndDate,Status)
              VALUES (?,?,?,?,?)"
         );
         $stmt->bind_param("sssss",$pn,$desc,$sd,$ed,$st);
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['action'])) {
     } elseif ($_POST['action']==='update') {
         $id=(int)$_POST['prog_id'];
         $stmt=$conn->prepare(
-            "UPDATE tblProgram
+            "UPDATE tblprogram
              SET ProgramName=?,Description=?,StartDate=?,EndDate=?,Status=?
              WHERE ProgramID=?"
         );
@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['action'])) {
 
 if (isset($_GET['delete'])) {
     $id=(int)$_GET['delete'];
-    $stmt=$conn->prepare("DELETE FROM tblProgram WHERE ProgramID=?");
+    $stmt=$conn->prepare("DELETE FROM tblprogram WHERE ProgramID=?");
     $stmt->bind_param("i",$id);
     if ($stmt->execute()) { $msg='Program deleted.'; }
     else { $msg='Error: '.$stmt->error; $msgType='danger'; }
@@ -53,13 +53,13 @@ if (isset($_GET['delete'])) {
 
 if ($action==='edit' && isset($_GET['id'])) {
     $res=$conn->query(
-        "SELECT * FROM tblProgram WHERE ProgramID=".(int)$_GET['id']
+        "SELECT * FROM tblprogram WHERE ProgramID=".(int)$_GET['id']
     );
     $editProg=$res->fetch_assoc();
 }
 
 $programs=$conn->query(
-    "SELECT * FROM tblProgram ORDER BY StartDate DESC"
+    "SELECT * FROM tblprogram ORDER BY StartDate DESC"
 );
 ?>
 <!DOCTYPE html>

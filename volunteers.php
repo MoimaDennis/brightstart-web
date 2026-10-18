@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
     if ($_POST['action'] === 'add') {
         $stmt = $conn->prepare(
-            "INSERT INTO tblVolunteer
+            "INSERT INTO tblvolunteer
              (FullName,ContactEmail,ContactNumber,SubjectSpeciality,JoinDate,Status)
              VALUES (?,?,?,?,?,?)"
         );
@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     } elseif ($_POST['action'] === 'update') {
         $id = (int)$_POST['vol_id'];
         $stmt = $conn->prepare(
-            "UPDATE tblVolunteer
+            "UPDATE tblvolunteer
              SET FullName=?,ContactEmail=?,ContactNumber=?,
                  SubjectSpeciality=?,JoinDate=?,Status=?
              WHERE VolunteerID=?"
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
-    $stmt = $conn->prepare("DELETE FROM tblVolunteer WHERE VolunteerID=?");
+    $stmt = $conn->prepare("DELETE FROM tblvolunteer WHERE VolunteerID=?");
     $stmt->bind_param("i",$id);
     if ($stmt->execute()) { $msg = 'Volunteer deleted.'; }
     else { $msg = 'Error: '.$stmt->error; $msgType='danger'; }
@@ -62,13 +62,13 @@ if (isset($_GET['delete'])) {
 
 if ($action === 'edit' && isset($_GET['id'])) {
     $res = $conn->query(
-        "SELECT * FROM tblVolunteer WHERE VolunteerID=".(int)$_GET['id']
+        "SELECT * FROM tblvolunteer WHERE VolunteerID=".(int)$_GET['id']
     );
     $editVol = $res->fetch_assoc();
 }
 
 $volunteers = $conn->query(
-    "SELECT * FROM tblVolunteer ORDER BY FullName ASC"
+    "SELECT * FROM tblvolunteer ORDER BY FullName ASC"
 );
 ?>
 <!DOCTYPE html>

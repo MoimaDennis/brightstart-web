@@ -9,7 +9,7 @@ if (!$email || !$password) {
     exit();
 }
 
-$stmt = $pdo->prepare("SELECT * FROM administrator WHERE Email = ?");
+$stmt = $pdo->prepare("SELECT * FROM tbladministrator WHERE Email = ?");
 $stmt->execute([$email]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
