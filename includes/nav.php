@@ -1,14 +1,30 @@
 <?php
+/** @var mysqli $conn */
+/** @var string $currentUser */
+/** @var string $currentRole */
+/** @var string $currentEmail */
 $pendingNav = $conn->query("SELECT COUNT(*) AS c FROM tbladministrator WHERE Verified = 0");
 $pendingNavCount = $pendingNav ? $pendingNav->fetch_assoc()['c'] : 0;
+
+// The signed-in user's saved settings (theme, text size, slider)
+$userTheme = 'dark'; $userTextSize = 'normal'; $userSlider = 1;
+$sRes = $conn->query("SELECT Theme, TextSize, ShowDashboardSlider FROM tblusersettings WHERE AdminID = " . (int)$_SESSION['admin_id']);
+if ($sRes && ($sRow = $sRes->fetch_assoc())) {
+    $userTheme = $sRow['Theme']; $userTextSize = $sRow['TextSize']; $userSlider = (int)$sRow['ShowDashboardSlider'];
+}
 ?>
+<script>
+document.body.classList.add('theme-<?= $userTheme ?>', 'text-<?= $userTextSize ?>');
+</script>
+<?php if (!$userSlider): ?><style>.hero-slider{display:none !important;}</style><?php endif; ?>
 <div class="topbar">
     <span>🎓 Bright Start Education Support System</span>
     <span>Logged in as: <strong><?= $currentUser ?></strong> | Role: <?= $currentRole ?></span>
 </div>
 <nav>
     <a class="logo" href="dashboard.php">Bright<span>Start</span></a>
-    <ul>
+    <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false">☰</button>
+    <ul id="mainMenu">
         <li><a href="dashboard.php" <?= basename($_SERVER['PHP_SELF'])==='dashboard.php'?'class="active"':'' ?>>🏠 Dashboard</a></li>
 
         <?php if ($currentRole === 'Admin'): ?>
@@ -82,5 +98,20 @@ $pendingNavCount = $pendingNav ? $pendingNav->fetch_assoc()['c'] : 0;
 </nav>
 <div class="user-banner">
     <span>👤 <strong><?= $currentUser ?></strong> <span class="badge"><?= $currentRole ?></span></span>
-    <span><?= $currentEmail ?> | <a href="logout.php">Logout →</a></span>
+    <span><?= $currentEmail ?> | <a href="settings.php">⚙️ Settings</a> | <a href="help.php">❓ Help</a> | <a href="logout.php">Logout →</a></span>
 </div>
+<script>
+(function () {
+    var toggle = document.querySelector('.nav-toggle'), menu = document.getElementById('mainMenu');
+    if (!toggle || !menu) return;
+    toggle.addEventListener('click', function () {
+        var open = menu.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    document.querySelectorAll('.dropdown-btn').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+            if (window.innerWidth <= 768) { e.preventDefault(); btn.parentElement.classList.toggle('open'); }
+        });
+    });
+})();
+</script>

@@ -385,3 +385,73 @@ footer span { color: var(--accent); font-style: italic; font-family: var(--font-
     .stats-grid { grid-template-columns: repeat(2,1fr); }
     .container { margin: 16px auto; }
 }
+/* =====================================================================
+   PART 2 ADDITIONS: mobile menu, themes, text size, Google button
+   ===================================================================== */
+.nav-toggle { display: none; background: none; border: 1px solid rgba(184,224,74,0.4); color: var(--accent);
+              font-size: 1.4rem; line-height: 1; padding: 6px 12px; border-radius: 10px; cursor: pointer; }
+
+.divider { display: flex; align-items: center; gap: 12px; margin: 18px 0; color: var(--text-light); font-size: .8rem; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: rgba(184,224,74,0.2); }
+.btn-google { background: #fff; color: #333; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; gap: 10px; }
+.btn-google:hover { background: #f2f2f2; }
+.btn-google:disabled { opacity: .6; cursor: wait; }
+
+.settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.help-list details { border: 1px solid rgba(184,224,74,0.2); border-radius: .85rem; padding: 12px 16px; margin-bottom: 10px; }
+.help-list summary { cursor: pointer; font-weight: 600; color: var(--accent); }
+.help-list details p, .help-list details ol, .help-list details ul { margin: 10px 0 0 0; color: var(--off-white); line-height: 1.6; }
+.help-list details ol, .help-list details ul { padding-left: 22px; }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* ---- Text size setting ---- */
+body.text-large { font-size: 118%; }
+body.text-large .data-table, body.text-large .btn, body.text-large nav ul li a { font-size: 1rem; }
+
+/* ---- Light theme setting ---- */
+body.theme-light {
+    --primary: #e3efe0; --secondary: #cfe3c9; --green-deep: #f4f8f1; --white: #14301f; --off-white: #1f3d2b;
+    --text-light: #4b6455; --accent: #2d7a3e; --accent-dark: #256833; --border: rgba(45,122,62,0.25);
+    background: #f4f8f1; color: #14301f;
+}
+body.theme-light .topbar { background: #e3efe0; color: #4b6455; }
+body.theme-light nav { background: #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,.08); }
+body.theme-light nav ul li a:hover, body.theme-light nav ul li .dropdown-btn:hover, body.theme-light nav ul li a.active { color: #fff; }
+body.theme-light .dropdown-menu { background: #ffffff; }
+body.theme-light .user-banner { background: #e9f1e6; color: #14301f; }
+body.theme-light .user-banner .badge { color: #fff; }
+body.theme-light .card, body.theme-light .stat-card { background: #ffffff; border-color: rgba(45,122,62,0.25); }
+body.theme-light .btn-primary, body.theme-light .btn-accent, body.theme-light .btn-success { color: #fff; }
+body.theme-light .form-group input, body.theme-light .form-group select, body.theme-light .form-group textarea {
+    background: #fff; color: #14301f; border-color: rgba(45,122,62,0.35); }
+body.theme-light .form-group select option { background: #fff; color: #14301f; }
+body.theme-light .data-table thead th { color: #2d7a3e; }
+body.theme-light .data-table tbody td { color: #1f3d2b; }
+body.theme-light footer { background: #e3efe0; color: #4b6455; }
+body.theme-light .alert-success { color: #1e6b30; } body.theme-light .alert-danger { color: #b3261e; }
+body.theme-light .alert-warning { color: #8a5a00; } body.theme-light .alert-info { color: #1f3d2b; }
+body.theme-light .badge-active, body.theme-light .badge-present { color: #1e6b30; }
+body.theme-light nav ul li a[href="logout.php"] { color: #b3261e !important; }
+
+/* ---- Phones and small tablets ---- */
+@media (max-width: 768px) {
+    .topbar { padding: 5px 16px; flex-direction: column; gap: 2px; font-size: .72rem; }
+    nav { position: relative; }
+    .nav-toggle { display: block; }
+    nav ul { display: none; flex-direction: column; width: 100%; gap: 2px; padding: 8px 0 12px; }
+    nav ul.open { display: flex; }
+    nav ul li a, nav ul li .dropdown-btn { width: 100%; text-align: left; border-radius: 10px; padding: 12px 14px; font-size: .95rem; }
+    .dropdown:hover .dropdown-menu { display: none; }
+    .dropdown.open .dropdown-menu { display: block; }
+    .dropdown-menu { position: static; box-shadow: none; border: none; background: rgba(255,255,255,0.04); margin-left: 12px; }
+    .user-banner { flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px 16px; }
+    .settings-grid { grid-template-columns: 1fr; }
+    .card { overflow-x: auto; }
+    .data-table { min-width: 520px; }
+    .hero-slider { height: 520px !important; }
+    .slide-content { padding: 0 24px !important; }
+    .slide-title { font-size: 2.1rem !important; }
+    .slide-stats { gap: 18px !important; flex-wrap: wrap; }
+    .slider-arrow { display: none !important; }
+    div[style*="grid-template-columns:1fr 1fr"] { grid-template-columns: 1fr !important; }
+}
