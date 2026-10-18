@@ -1,0 +1,62 @@
+name: CI - build and test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mysqli, pdo_mysql, curl
+
+      - name: Check every PHP file for syntax errors
+        run: find . -name "*.php" -not -path "./vendor/*" -print0 | xargs -0 -n1 php -l
+
+      - name: Install test tools
+        run: composer install --prefer-dist --no-progress
+
+      - name: Create the database from db/schema.sql
+        run: mysql -h 127.0.0.1 -uroot -proot < db/schema.sql
+
+      - name: Start the website and a fake Google server
+        env:
+          DB_HOST: 127.0.0.1
+          DB_USER: root
+          DB_PASS: root
+          DB_NAME: brightstart
+          FIREBASE_LOOKUP_URL: http://127.0.0.1:9099/lookup.php
+        run: |
+          php -S 127.0.0.1:9099 -t tests/mock > mock.log 2>&1 &
+          php -S 127.0.0.1:8080 > site.log 2>&1 &
+          sleep 3
+          curl --fail --silent http://127.0.0.1:8080/login.php > /dev/null
+
+      - name: Run automated tests
+        env:
+          BASE_URL: http://127.0.0.1:8080
+          FIREBASE_LOOKUP_URL: http://127.0.0.1:9099/lookup.php
+        run: vendor/bin/phpunit --testdox
