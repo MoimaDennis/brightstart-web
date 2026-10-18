@@ -155,12 +155,24 @@ $upcomingSessions=$conn->query("SELECT s.SessionID,p.ProgramName,v.FullName AS V
 <!-- DASHBOARD -->
 <div class="container">
     <div class="stats-grid" style="margin-top:28px;">
-        <div class="stat-card green"><div class="stat-icon">👩‍🎓</div><div class="stat-num"><?= $stats['students'] ?></div><div class="stat-label">Students Registered</div></div>
-        <div class="stat-card"><div class="stat-icon">🙋</div><div class="stat-num"><?= $stats['volunteers'] ?></div><div class="stat-label">Active Volunteers</div></div>
-        <div class="stat-card gold"><div class="stat-icon">📚</div><div class="stat-num"><?= $stats['programs'] ?></div><div class="stat-label">Programs Running</div></div>
-        <div class="stat-card"><div class="stat-icon">🗓️</div><div class="stat-num"><?= $stats['sessions'] ?></div><div class="stat-label">Sessions Scheduled</div></div>
-        <div class="stat-card orange"><div class="stat-icon">💰</div><div class="stat-num" style="font-size:1.3rem;">R <?= $totalDonations ?></div><div class="stat-label">Total Donations</div></div>
-        <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-num"><?= $stats['enrolments'] ?></div><div class="stat-label">Enrolments</div></div>
+        <div class="stat-card green"><div class="stat-icon">👩‍🎓</div><div class="stat-num" id="stat-students"><?= $stats['students'] ?></div><div class="stat-label">Students Registered</div></div>
+        <div class="stat-card"><div class="stat-icon">🙋</div><div class="stat-num" id="stat-volunteers"><?= $stats['volunteers'] ?></div><div class="stat-label">Volunteers</div></div>
+        <div class="stat-card gold"><div class="stat-icon">📚</div><div class="stat-num" id="stat-programs"><?= $stats['programs'] ?></div><div class="stat-label">Programs Running</div></div>
+        <div class="stat-card"><div class="stat-icon">🗓️</div><div class="stat-num" id="stat-sessions"><?= $stats['sessions'] ?></div><div class="stat-label">Sessions Scheduled</div></div>
+        <div class="stat-card orange"><div class="stat-icon">💰</div><div class="stat-num" id="stat-donations" style="font-size:1.3rem;">R <?= $totalDonations ?></div><div class="stat-label">Total Donations</div></div>
+        <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-num" id="stat-enrolments"><?= $stats['enrolments'] ?></div><div class="stat-label">Enrolments</div></div>
+    </div>
+
+    <div class="card">
+        <h2>🔎 Quick Student Search</h2>
+        <div class="form-group" style="margin-bottom:10px;">
+            <label for="quickSearch">Type a name or community</label>
+            <input id="quickSearch" type="text" placeholder="e.g. Soweto or Naledi" autocomplete="off">
+        </div>
+        <div class="table-scroll"><table class="data-table">
+            <thead><tr><th>Name</th><th>Community</th><th>Contact</th></tr></thead>
+            <tbody id="quickResults"><tr><td colspan="3" style="color:var(--text-light);">Start typing to search students…</td></tr></tbody>
+        </table></div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
@@ -247,6 +259,35 @@ let touchStartX=0;
 document.getElementById('heroSlider').addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX;},{passive:true});
 document.getElementById('heroSlider').addEventListener('touchend',e=>{const diff=touchStartX-e.changedTouches[0].clientX;if(Math.abs(diff)>50){changeSlide(diff>0?1:-1);resetAuto();}},{passive:true});
 resetAuto(); resetProgress();
+</script>
+
+<script>
+// Dashboard numbers and the quick search are loaded from our own API
+function esc(t){var d=document.createElement('div');d.textContent=t==null?'':t;return d.innerHTML;}
+fetch('api/dashboard_stats.php').then(function(r){return r.json();}).then(function(d){
+    if(!d.success) return;
+    document.getElementById('stat-students').textContent   = d.students;
+    document.getElementById('stat-volunteers').textContent = d.volunteers;
+    document.getElementById('stat-programs').textContent   = d.programs;
+    document.getElementById('stat-sessions').textContent   = d.sessions;
+    document.getElementById('stat-enrolments').textContent = d.enrolments;
+    document.getElementById('stat-donations').textContent  = 'R ' + Number(d.total_donations_amount).toLocaleString('en-ZA',{minimumFractionDigits:2,maximumFractionDigits:2});
+}).catch(function(){ /* the server-rendered numbers stay on screen */ });
+
+var searchTimer=null, box=document.getElementById('quickSearch'), out=document.getElementById('quickResults');
+box.addEventListener('input',function(){
+    clearTimeout(searchTimer);
+    var q=box.value.trim();
+    if(q.length<2){ out.innerHTML='<tr><td colspan="3" style="color:var(--text-light);">Type at least 2 letters…</td></tr>'; return; }
+    searchTimer=setTimeout(function(){
+        fetch('api/get_students.php?search='+encodeURIComponent(q)).then(function(r){return r.json();}).then(function(d){
+            if(!d.success||!d.data.length){ out.innerHTML='<tr><td colspan="3">No students found.</td></tr>'; return; }
+            out.innerHTML=d.data.slice(0,8).map(function(s){
+                return '<tr><td><strong>'+esc(s.FirstName+' '+s.LastName)+'</strong></td><td>'+esc(s.CommunityArea)+'</td><td>'+esc(s.ContactNumber)+'</td></tr>';
+            }).join('');
+        }).catch(function(){ out.innerHTML='<tr><td colspan="3">Search is unavailable right now.</td></tr>'; });
+    },300);
+});
 </script>
 </body>
 </html>
