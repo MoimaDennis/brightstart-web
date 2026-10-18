@@ -1,130 +1,92 @@
-# BrightStart (Web App)
+# BrightStart Education Support – Website
 
-PHP/MySQL web platform for **BrightStart**, an education initiative. It serves a public-facing marketing site alongside an admin dashboard for managing students, programs, attendance, donations, volunteers, and performance — and exposes a JSON API consumed by the [BrightStart Android app](https://github.com/<your-username>/brightstart-android).
+PHP / MySQL website, JSON API and admin dashboard for **BrightStart**, a non-profit education initiative in South Africa. Staff and volunteers use it to manage students, programs, sessions, attendance, performance and donations.
+
+**Module:** XISD6329 – Part 2 | **Live site:** https://
+BrightStart-Part2.azurewebsites.net | **Project board:** https://dev.azure.com/ST104519320228
+/BrightStart-Part2
+
+> Team: Dennis Moima (St10451932), Kgothatso Magatsela (St10448288), Keabetswe Modiba (St10438507), Chantal Mafa (St10444319)
+
+## Demo accounts (sample data)
+
+| Role | Email | Password |
+|---|---|---|
+| Admin | admin@brightstart.org | Admin@123 |
+| Coordinator | coordinator@brightstart.org | Pass@1234 |
+| Volunteer | lerato.khumalo@brightstart.org | Pass@1234 |
+
+You can also click **Continue with Google** on the login page. New Google accounts start as *Volunteer* and must be approved by an Admin.
 
 ## Features
 
-**Public site**
-- Landing page with program info and image slider (`index.php`)
-- Donation page (`donate.php`)
-- Admin registration and login (`register.php`, `login.php`)
+- Sign in with email + password (bcrypt-hashed) or Google single sign-on (Firebase)
+- Registration with validation and Admin approval
+- Settings: theme, text size, dashboard slider, profile, change password
+- Help Centre (help.php)
+- Students, volunteers, programs, sessions, enrolments, attendance, performance, donations, reports
+- Role-based menus and a responsive phone layout
 
-**Admin dashboard**
-- Dashboard overview (`dashboard.php`)
-- Student management (`students.php`)
-- Enrolments (`enrolments.php`)
-- Attendance tracking (`attendance.php`)
-- Programs & sessions (`programs.php`, `sessions.php`)
-- Volunteer management (`volunteers.php`)
-- Donations (`donations.php`)
-- Performance tracking (`performance.php`)
-- Reports (`reports.php`)
-- Admin user management with approval workflow (`admin_users.php`)
+## Tech stack
 
-**API** (`/api`)
+| Part | Technology |
+|---|---|
+| Backend | PHP 8.x |
+| Database | MySQL 8 (Azure Database for MySQL) |
+| Front end | HTML, CSS, JavaScript |
+| Authentication | PHP sessions + bcrypt, Firebase Authentication |
+| Hosting | Azure App Service |
+| DevOps | Azure Boards, GitHub, GitHub Actions |
+| Tests | PHPUnit 10 |
 
-A REST-style JSON API backing both the web dashboard and the Android app, with `get_`, `add_`, `update_`, and `delete_` endpoints for: students, enrolments, attendance, programs, sessions, volunteers, donations, performance, and admin users. Also includes `login.php`, `register.php`, `approve_user.php`, and `reject_user.php` for auth and account approval.
+## Database
 
-## Tech Stack
+10 tables, created by `db/schema.sql` (with 10+ sample rows each). They use primary keys, foreign keys, unique keys and CHECK rules.
 
-- **Backend:** PHP (PDO + MySQL)
-- **Frontend:** Server-rendered PHP templates, plain CSS, vanilla JS where needed
-- **Auth:** PHP sessions, with `password_hash`/`password_verify` for credentials and an admin-approval gate before login
+![ERD](docs/erd.png)
 
-## Project Structure
-BrightStart/
+## API
 
-├── api/                # JSON API endpoints (CRUD per resource + auth)
+All endpoints are under `/api/` and return JSON `{ "success": true/false, ... }`.
 
-│   └── db.php           # Database connection
+| Endpoint | Method | Purpose |
+|---|---|---|
+| login.php, register.php, sso_login.php | POST | Sign in / create account / Google sign-in |
+| get_settings.php, update_settings.php | GET / POST | User settings |
+| dashboard_stats.php | GET | Dashboard totals |
+| get_students.php?search= | GET | List / search students |
+| add_, update_, delete_ + resource name | POST / DELETE | Create, edit, delete records |
 
-├── includes/
+## Run it locally (XAMPP)
 
-│   ├── DBConn.php        # Shared DB connection for page templates
+1. Install XAMPP and start **Apache** and **MySQL**.
+2. Copy this folder into `C:\xampp\htdocs\`.
+3. Open http://localhost/phpmyadmin, click **Import**, choose `db/schema.sql`, click **Import**.
+4. Open http://localhost/brightstart-web
+/ and sign in with a demo account.
 
-│   ├── auth_guard.php     # Session/login guard for protected pages
+## Automated testing and CI/CD
 
-│   └── nav.php            # Shared nav partial
+- `.github/workflows/ci.yml` runs on every push: PHP syntax check, then builds the MySQL database, starts the site and runs PHPUnit.
+- The Azure deployment workflow deploys `main` to Azure App Service automatically.
+- Run tests yourself: `composer install` then `vendor/bin/phpunit --testdox`
 
-├── css/
+## DevOps life cycle
 
-│   └── style.css
+| Phase | Tool |
+|---|---|
+| Plan | Azure Boards |
+| Code | Git + GitHub (commits linked with AB#id) |
+| Build | GitHub Actions |
+| Test | PHPUnit |
+| Deploy | GitHub Actions to Azure App Service |
+| Monitor | Azure App Service logs and metrics |
 
-├── images/
+## Known limitations
 
-├── index.php            # Public landing page
+- Some Part 1 API endpoints are open (no token). Use sample data only.
+- Free Azure tiers can be slow on the first request after idle time.
 
-├── donate.php
+## Licence
 
-├── login.php / register.php / logout.php
-
-├── dashboard.php
-
-├── students.php / enrolments.php / attendance.php
-
-├── programs.php / sessions.php
-
-├── volunteers.php / donations.php / performance.php
-
-├── reports.php
-
-└── admin_users.php
-
-
-## Setup
-
-### Prerequisites
-
-- PHP 7.4+ (with PDO MySQL extension)
-- MySQL/MariaDB
-- A local server stack such as XAMPP, WAMP, MAMP, or `php -S`
-
-### Database
-
-No SQL schema file is currently checked into the repo. You'll need a `brightstart` database with (at minimum) an `administrator` table matching the fields referenced in `api/login.php` (`Email`, `PasswordHash`, `Verified`, etc.), plus tables for students, enrolments, attendance, programs, sessions, volunteers, donations, and performance records used by the corresponding API endpoints.
-
-> Consider adding a `schema.sql` to this repo so the database can be recreated from scratch.
-
-### Configuration
-
-Database credentials are set in `api/db.php`:
-
-```php
-$host = "localhost";
-$db   = "brightstart";
-$user = "root";
-$pass = "";
-```
-
-These are local development defaults — update them for your environment, and consider moving them to environment variables before deploying anywhere public.
-
-### Running locally
-
-```bash
-git clone https://github.com/<your-username>/brightstart-web.git
-cd brightstart-web
-```
-
-With XAMPP/WAMP/MAMP: place the folder in your server's web root (e.g. `htdocs/`) and visit `http://localhost/BrightStart/`.
-
-Or with PHP's built-in server:
-
-```bash
-php -S localhost:8000
-```
-
-Then visit `http://localhost:8000`.
-
-### Connecting the Android app
-
-The Android client expects this API to be reachable at a configured base URL (see its `BASE_URL` build config field). If testing on a real device, expose your local server via a tool like ngrok and point the app at that URL.
-
-## Security Notes
-
-- Passwords are hashed with PHP's `password_hash`; never store plaintext passwords.
-- New admin registrations require approval (`Verified` flag) before login succeeds.
-- The default DB credentials in `api/db.php` are for local development only — replace them before any public deployment.
-
-## License
-
-No license specified yet — add one (e.g. MIT) if you intend to make this publicly reusable.
+Educational project for the Independent Institute of Education (IIE). All sample data is fictional.
