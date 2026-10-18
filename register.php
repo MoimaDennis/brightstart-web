@@ -2,6 +2,7 @@
 session_start();
 if (isset($_SESSION['admin_id'])) { header("Location: dashboard.php"); exit(); }
 require_once 'includes/DBConn.php';
+require_once 'includes/validation.php';
 $error = ''; $success = '';
 $stickyName = ''; $stickyEmail = ''; $stickyUsername = ''; $stickyRole = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -14,12 +15,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stickyName=$fullName; $stickyEmail=$email; $stickyUsername=$username; $stickyRole=$role;
     if (empty($fullName)||empty($email)||empty($username)||empty($password)||empty($confirm)||empty($role)) {
         $error = 'All fields are required.';
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = 'Please enter a valid email address.';
-    } elseif (strlen($username) < 4) {
-        $error = 'Username must be at least 4 characters.';
-    } elseif (strlen($password) < 6) {
-        $error = 'Password must be at least 6 characters.';
+    } elseif ($e = validate_full_name($fullName)) {
+        $error = $e;
+    } elseif ($e = validate_email($email)) {
+        $error = $e;
+    } elseif ($e = validate_username($username)) {
+        $error = $e;
+    } elseif (!in_array($role, ['Volunteer','Coordinator','Management'], true)) {
+        $error = 'Please choose a valid role.';
+    } elseif ($e = validate_password($password)) {
+        $error = $e;
     } elseif ($password !== $confirm) {
         $error = 'Passwords do not match.';
     } else {
@@ -88,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <small style="color:#999;font-size:.78rem;">Admin role is assigned by the Administrator only.</small>
             </div>
             <div class="form-group">
-                <label>Password * <span style="color:#999;font-size:.8rem;">(min 6 characters)</span></label>
+                <label>Password * <span style="color:#999;font-size:.8rem;">(min 8 characters, letters and numbers)</span></label>
                 <input type="password" name="password" placeholder="Strong password" required maxlength="100">
             </div>
             <div class="form-group">
