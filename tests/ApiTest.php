@@ -201,4 +201,24 @@ final class ApiTest extends TestCase
         [, $after] = $this->call('GET', 'api/get_students.php?search=' . $unique);
         $this->assertCount(0, $after['data']);
     }
+
+    // ---------- Mobile app sign-in (API login must start a session) ----------
+    public function testApiLoginStartsASessionForTheMobileApp(): void
+    {
+        $this->call('POST', 'api/logout.php');
+        [, $login] = $this->call('POST', 'api/login.php', ['email' => 'admin@brightstart.org', 'password' => 'Admin@123']);
+        $this->assertTrue($login['success']);
+        [$code, $settings] = $this->call('GET', 'api/get_settings.php');
+        $this->assertSame(200, $code);
+        $this->assertSame('Admin', $settings['profile']['Role']);
+    }
+
+    public function testApiLogoutEndsTheSession(): void
+    {
+        $this->call('POST', 'api/login.php', ['email' => 'admin@brightstart.org', 'password' => 'Admin@123']);
+        [, $out] = $this->call('POST', 'api/logout.php');
+        $this->assertTrue($out['success']);
+        [$code] = $this->call('GET', 'api/get_settings.php');
+        $this->assertSame(401, $code);
+    }
 }
